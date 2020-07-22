@@ -47,7 +47,7 @@ def search(request):
         listOfFiles = util.list_entries()
         print(listOfFiles)
         #searching for the exact name in the entery list
-        if query in listOfFiles:
+        if any(s.upper() == query for s in listOfFiles):
             return HttpResponseRedirect(reverse("entry", args=(query,)))
         #searching for the substring in the entery list and return the list that matches
         searchPattren = re.compile(query, re.IGNORECASE)
@@ -60,4 +60,18 @@ def search(request):
                 "title": "Search",
                 "entries": resultList,
         })
-        
+
+def newEntry(request):
+    #When the request POST
+    if request.method == 'POST':
+        title = request.POST["title"]
+        content = request.POST["content"]
+        listOfFiles = util.list_entries()
+        if any(s.upper() == title.upper() for s in listOfFiles):
+            return render(request, "encyclopedia/error.html",{
+                "message": f"The title ({title}) is already exists",
+            })
+        util.save_entry(title, content)
+        return HttpResponseRedirect(reverse("entry", args=(title,)))
+    # When the request GET
+    return render(request, "encyclopedia/newEntry.html")
