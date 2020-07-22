@@ -1,0 +1,20 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    NewEntry
+{% endblock %}
+
+{% block body %}
+    <h1>New Entry Form</h1>
+    <form action="{% url 'newEntry' %}" method="POST">
+        {% csrf_token %}
+        <div style="padding-bottom: 10px;">
+            <input type="text" name="title" placeholder="The title" autofocus>
+        </div>
+        <div style="padding-bottom: 10px;">
+            <textarea name="content" cols="50" rows="100" placeholder="The content of the entry" style="height: 400px;"></textarea>
+        </div>
+        <button type="submit">Save</button>
+    </form>
+
+{% endblock %} 

@@ -1,4 +1,5 @@
 import re
+import random
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -67,6 +68,11 @@ def newEntry(request):
         title = request.POST["title"]
         content = request.POST["content"]
         listOfFiles = util.list_entries()
+        # If the title or the content is empty, error message should be displayed 
+        if title == "" or content == "":
+             return render(request, "encyclopedia/error.html",{
+                "message": "Please fill the title field with valid title and the content field with valid Markdown content",
+            })
         if any(s.upper() == title.upper() for s in listOfFiles):
             return render(request, "encyclopedia/error.html",{
                 "message": f"The title ({title}) is already exists",
@@ -88,3 +94,8 @@ def edit(request, title):
         "fileName": title,
         "content": source,
     })
+
+def randomPage(request):
+    # random.choice is a function that randomly choose an item from a list. 
+    entry = random.choice(util.list_entries())
+    return HttpResponseRedirect(reverse("entry", args=(entry,)))
