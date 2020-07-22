@@ -18,7 +18,7 @@ def entry(request, title):
             "content": "<h1>Error</h1>\n<p>Could not find the page you requested</p>\n"
         })
 
-    p = re.compile(r'^(#+) (.+?)\s', re.MULTILINE)
+    p = re.compile(r'^(#+) (.+?)\n', re.MULTILINE)
     test = p.finditer(source)
     for item in test:
         if len(item.group(1))!=0:
@@ -35,7 +35,7 @@ def entry(request, title):
     source = ulpattren.sub(r'<ul>\n\g<0>\n</ul>', source)
     source = re.sub(r'\*\*(.*?)\*\*', r'<strong>\g<1></strong>', source)
     return render(request, "encyclopedia/entry.html",{
-        "title": title.upper(),
+        "title": title,
         "content": source
     })
 
@@ -75,3 +75,16 @@ def newEntry(request):
         return HttpResponseRedirect(reverse("entry", args=(title,)))
     # When the request GET
     return render(request, "encyclopedia/newEntry.html")
+
+def edit(request, title):
+    # Whe the save button pushed, the requset will be POST
+    if request.method == 'POST':
+        source = request.POST["content"]
+        util.save_entry(title, source)
+        return HttpResponseRedirect(reverse("entry", args=(title,)))
+    # when the request is GET, Run the Edit page
+    source = util.get_entry(title)
+    return render(request, "encyclopedia/editEntry.html", {
+        "fileName": title,
+        "content": source,
+    })
